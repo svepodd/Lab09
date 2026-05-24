@@ -135,25 +135,38 @@ jobs:
           done
 
       - name: ZAP baseline scan
+        # ВАЖНО: встроенный загрузчик артефактов ZAP-action на GitHub-раннере
+        # всегда падает с "artifact name ... is not valid" (старый API).
+        # Это происходит ПОСЛЕ генерации отчётов, поэтому файлы уже на диске.
+        # continue-on-error не даёт этому падению уронить весь job —
+        # отчёты мы забираем своим upload-artifact ниже.
+        continue-on-error: true
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: "http://localhost:${{ env.APP_PORT }}"
           rules_file_name: "pipeline/dast/zap-baseline.conf"
-          # НЕ дублируем -J/-r: action сам пишет report_json.json,
-          # report_md.md и report_html.html в корень workspace.
           fail_action: false
-          # Не создавать GitHub Issue с находками
-          allow_issue_writing: false
-          # Имя артефакта БЕЗ дефиса: внутренний uploader ZAP-action
-          # (старый API) не принимает дефисы в имени.
-          artifact_name: dast_reports
 
-      - name: Show ZAP report files
+      - name: Collect ZAP reports
         if: always()
         run: |
+          mkdir -p dast-out
           echo "=== Отчёты ZAP в корне workspace ==="
           ls -la report_json.json report_md.md report_html.html 2>/dev/null || true
-          find "$GITHUB_WORKSPACE" -maxdepth 2 -name "report_*.*" -print 2>/dev/null || true
+          # Переименовываем в zap-report.* и кладём в dast-out/
+          cp report_json.json dast-out/zap-report.json 2>/dev/null || true
+          cp report_html.html dast-out/zap-report.html 2>/dev/null || true
+          cp report_md.md     dast-out/zap-report.md   2>/dev/null || true
+          echo "=== Содержимое dast-out/ ==="
+          ls -la dast-out/ || true
+
+      - name: Upload DAST reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dast-reports
+          path: dast-out/
+          if-no-files-found: warn
 
       - name: Stop application
         if: always()
