@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>DevSecOps Unified Report — lab09</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+         margin: 2rem; background: #fafafa; color: #222; }
+  h1 { border-bottom: 3px solid #2c3e50; padding-bottom: .5rem; }
+  .meta { color: #666; margin-bottom: 1.5rem; }
+  .summary { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+  .card { background: white; padding: 1rem 1.5rem; border-radius: 6px;
+          box-shadow: 0 1px 3px rgba(0,0,0,.1); min-width: 130px; }
+  .card .num { font-size: 2rem; font-weight: bold; }
+  .card.crit .num { color: #c0392b; }
+  .card.high .num { color: #e67e22; }
+  .card.med  .num { color: #d4ac0d; }
+  .card.low  .num { color: #3498db; }
+  .card.info .num { color: #95a5a6; }
+  table { width: 100%; border-collapse: collapse; background: white;
+          box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  th { background: #2c3e50; color: white; text-align: left; padding: .6rem .8rem; }
+  td { padding: .6rem .8rem; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:hover { background: #f5f5f5; }
+  .sev { display: inline-block; padding: 2px 8px; border-radius: 4px;
+         color: white; font-size: .85rem; font-weight: bold; }
+  .sev.CRITICAL { background: #c0392b; }
+  .sev.HIGH { background: #e67e22; }
+  .sev.MEDIUM { background: #d4ac0d; }
+  .sev.LOW { background: #3498db; }
+  .sev.INFO { background: #95a5a6; }
+  .sev.UNKNOWN { background: #7f8c8d; }
+  code { background: #eee; padding: 1px 4px; border-radius: 3px; font-size: .85rem; }
+  .desc { color: #555; max-width: 600px; }
+  .empty { text-align: center; padding: 3rem; color: #999; }
+</style>
+</head>
+<body>
+  <h1>DevSecOps Unified Report — lab09</h1>
+  <div class="meta">Сгенерировано: 2026-05-24 18:10:52 UTC · Всего находок: 36</div>
+  <div class="summary">
+    <div class="card crit"><div class="num">0</div><div>Critical</div></div>
+    <div class="card high"><div class="num">36</div><div>High</div></div>
+    <div class="card med"><div class="num">0</div><div>Medium</div></div>
+    <div class="card low"><div class="num">0</div><div>Low</div></div>
+    <div class="card info"><div class="num">0</div><div>Info</div></div>
+  </div>
+  <h2>По инструментам</h2>
+  <table>
+    <thead><tr><th>Инструмент</th><th>Находок</th></tr></thead>
+    <tbody>
+    <tr><td>Trivy (Image scan)</td><td>36</td></tr>
+    </tbody>
+  </table>
+  <h2 style="margin-top:2rem;">Все находки</h2>
+  
+  <table>
+    <thead><tr><th>Sev</th><th>Tool</th><th>ID</th><th>Title</th><th>Location</th><th>Description</th></tr></thead>
+    <tbody>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-69720</code></td>
+        <td>libncursesw6 6.5+20250216-2 → CVE-2025-69720</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-69720</code></td>
+        <td>libtinfo6 6.5+20250216-2 → CVE-2025-69720</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-6732</code></td>
+        <td>libxml2 2.12.7+dfsg+really2.9.14-2.1+deb13u2 → CVE-2026-6732</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">libxml2: libxml2: Denial of Service via crafted XSD-validated document</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-6732</code></td>
+        <td>libxml2-dev 2.12.7+dfsg+really2.9.14-2.1+deb13u2 → CVE-2026-6732</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">libxml2: libxml2: Denial of Service via crafted XSD-validated document</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2013-7445</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2013-7445</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: memory exhaustion via crafted Graphics Execution Manager (GEM) objects</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2019-19449</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2019-19449</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: mounting a crafted f2fs filesystem image can lead to slab-out-of-bounds read access in f2fs_build_segment_manager in fs/f2fs/segment.c</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2019-19814</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2019-19814</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: out-of-bounds write in __remove_dirty_segment in fs/f2fs/segment.c</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2021-3847</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2021-3847</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: low-privileged user privileges escalation</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2021-3864</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2021-3864</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: descendant's dumpable setting with certain SUID binaries</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2024-21803</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2024-21803</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: bluetooth: use-after-free vulnerability in af_bluetooth.c</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2024-58015</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2024-58015</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: wifi: ath12k: Fix for out-of bound access error</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2024-58093</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2024-58093</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: Linux kernel: PCI/ASPM use-after-free during hot-unplug</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-22104</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-22104</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: ibmvnic: Use kernel helpers for hex dumps</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-38137</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-38137</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: PCI/pwrctrl: Cancel outstanding rescan work when unregistering</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-38187</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-38187</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: drm/nouveau: fix a use-after-free in r535_gsp_rpc_push()</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-38204</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-38204</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: jfs: fix array-index-out-of-bounds read in add_missing_indices</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-38206</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-38206</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: Kernel: Double free vulnerability in exFAT filesystem can lead to denial of service</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-38421</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-38421</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: platform/x86/amd: pmf: Use device managed allocations</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-38636</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-38636</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: rv: Use strings in da monitors tracepoints</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-39859</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-39859</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: ptp: ocp: fix use-after-free bugs causing by ptp_ocp_watchdog</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-39862</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-39862</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: wifi: mt76: mt7915: fix list corruption after hardware restart</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-39958</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2025-39958</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: iommu/s390: Make attach succeed when the device was surprise removed</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-23102</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-23102</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: Linux kernel: Denial of Service due to incorrect SVE context restoration</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-23208</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-23208</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: ALSA: usb-audio: Prevent excessive number of frames</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-23327</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-23327</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: cxl/mbox: validate payload size before accessing contents in cxl_payload_from_user_allowed()</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-31493</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-31493</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: RDMA/efa: Fix use of completion ctx after free</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-31568</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-31568</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: s390/mm: Add missing secure storage access fixups for donated memory</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-31663</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-31663</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: xfrm: hold dev ref until after transport_finish NF_HOOK</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-31688</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-31688</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: driver core: enforce device_lock for driver_match_device()</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-43198</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-43198</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: tcp: fix potential race in tcp_v6_syn_recv_sock()</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-43494</code></td>
+        <td>linux-libc-dev 6.12.90-1 → CVE-2026-43494</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">kernel: net/rds: reset op_nents when zerocopy page pin fails</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-69720</code></td>
+        <td>ncurses-base 6.5+20250216-2 → CVE-2025-69720</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2025-69720</code></td>
+        <td>ncurses-bin 6.5+20250216-2 → CVE-2025-69720</td>
+        <td><code>lab09-app:ec9ba4d758e23d65f8986b6fdc91ebf7d912f5b9 (debian 13.5)</code></td>
+        <td class="desc">ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-23949</code></td>
+        <td>jaraco.context 5.3.0 → CVE-2026-23949</td>
+        <td><code>Python</code></td>
+        <td class="desc">jaraco.context: jaraco.context: Path traversal via malicious tar archives</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-24049</code></td>
+        <td>wheel 0.45.1 → CVE-2026-24049</td>
+        <td><code>Python</code></td>
+        <td class="desc">wheel: wheel: Privilege Escalation or Arbitrary Code Execution via malicious wheel file unpacking</td>
+      </tr>
+    
+      <tr>
+        <td><span class="sev HIGH">HIGH</span></td>
+        <td>Trivy (Image scan)</td>
+        <td><code>CVE-2026-24049</code></td>
+        <td>wheel 0.45.1 → CVE-2026-24049</td>
+        <td><code>Python</code></td>
+        <td class="desc">wheel: wheel: Privilege Escalation or Arbitrary Code Execution via malicious wheel file unpacking</td>
+      </tr>
+    
+    </tbody>
+  </table>
+  
+</body>
+</html>

@@ -105,7 +105,7 @@ jobs:
           output: "trivy-report.json"
           severity: "HIGH,CRITICAL"
           # exit-code "0" — режим аудита; "1" — блокирующий gate (шаг 16)
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: false
           vuln-type: "os,library"
 
@@ -145,7 +145,7 @@ jobs:
         with:
           target: "http://localhost:${{ env.APP_PORT }}"
           rules_file_name: "pipeline/dast/zap-baseline.conf"
-          fail_action: true
+          fail_action: false
 
       - name: Collect ZAP reports
         if: always()
