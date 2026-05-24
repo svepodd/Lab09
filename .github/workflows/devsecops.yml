@@ -2,9 +2,10 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [develop, main, svepodd_lab09]
+    branches: [develop, main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: lab09-app
@@ -61,15 +62,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # continue-on-error: шаг ФИКСИРУЕТ срабатывание gate (--failOnCVSS 9),
+      # но НЕ валит весь job. Так артефакт sca-reports создаётся, downstream
+      # jobs (Trivy, ZAP) запускаются, а сам факт превышения CVSS виден в логе.
+      # Для блокирующего gate (шаг 16) убери continue-on-error.
       - name: OWASP Dependency-Check
+        continue-on-error: true
         uses: dependency-check/Dependency-Check_Action@main
         with:
           project: "lab09-vulnerable-app"
           path: "app"
           format: "JSON"
           out: "pipeline/sca"
-          # --failOnCVSS 9: упасть при CVE с CVSS >= 9 (Critical)
-          # --enableExperimental: включить анализатор Python
           args: >-
             --failOnCVSS 9
             --enableExperimental
@@ -84,6 +88,9 @@ jobs:
     name: "Build + Trivy Image Scan"
     runs-on: ubuntu-latest
     needs: [sast, sca]
+    # always() + result != cancelled: запускаемся, даже если sca упал/прошёл с
+    # continue-on-error. Так Trivy отработает и создаст артефакт для шага 13.
+    if: ${{ always() && needs.sast.result != 'cancelled' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -95,9 +102,9 @@ jobs:
         with:
           image-ref: "${{ env.IMAGE_NAME }}:${{ github.sha }}"
           format: "json"
-          output: "pipeline/trivy-report.json"
+          output: "trivy-report.json"
           severity: "HIGH,CRITICAL"
-          # exit-code "0" — режим аудита; "1" — блокирующий gate
+          # exit-code "0" — режим аудита; "1" — блокирующий gate (шаг 16)
           exit-code: "0"
           ignore-unfixed: false
           vuln-type: "os,library"
@@ -106,12 +113,13 @@ jobs:
         if: always()
         with:
           name: trivy-report
-          path: pipeline/trivy-report.json
+          path: trivy-report.json
 
   dast:
     name: "DAST — OWASP ZAP"
     runs-on: ubuntu-latest
     needs: build-and-scan
+    if: ${{ always() && needs.build-and-scan.result == 'success' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -137,9 +145,9 @@ jobs:
       - name: Collect ZAP report
         if: always()
         run: |
-          mkdir -p pipeline/dast/out
-          cp zap-report.json pipeline/dast/out/ 2>/dev/null || true
-          cp zap-report.html pipeline/dast/out/ 2>/dev/null || true
+          mkdir -p dast-out
+          cp zap-report.json dast-out/ 2>/dev/null || true
+          cp zap-report.html dast-out/ 2>/dev/null || true
 
       - name: Stop application
         if: always()
@@ -149,7 +157,7 @@ jobs:
         if: always()
         with:
           name: dast-reports
-          path: pipeline/dast/out/
+          path: dast-out/
 
   report:
     name: "Unified Report"
@@ -166,7 +174,6 @@ jobs:
 
       - name: Normalize ZAP report name
         run: |
-          # download-artifact кладёт zap-report.json внутрь dast-reports/
           find pipeline/artifacts -name "zap-report.json" -exec cp {} pipeline/artifacts/ \; || true
 
       - name: Set up Python
