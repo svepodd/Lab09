@@ -139,37 +139,24 @@ jobs:
         with:
           target: "http://localhost:${{ env.APP_PORT }}"
           rules_file_name: "pipeline/dast/zap-baseline.conf"
-          cmd_options: "-J zap-report.json -r zap-report.html"
+          # НЕ дублируем -J/-r: action сам пишет report_json.json,
+          # report_md.md и report_html.html в корень workspace.
           fail_action: false
+          # Не создавать GitHub Issue с находками
+          allow_issue_writing: false
+          # Имя артефакта, который action загрузит сам
+          artifact_name: dast-reports
 
-      - name: Collect ZAP report
+      - name: Show ZAP report files
         if: always()
         run: |
-          mkdir -p dast-out
-          echo "=== Ищем файлы отчётов ZAP во всём workspace ==="
-          find "$GITHUB_WORKSPACE" -maxdepth 3 -type f \
-            \( -name "zap-report.*" -o -name "report_json.json" \
-               -o -name "report_html.html" -o -name "*zap*.html" \
-               -o -name "*zap*.json" \) -print 2>/dev/null || true
-          echo "=== Копируем всё найденное в dast-out/ ==="
-          find "$GITHUB_WORKSPACE" -maxdepth 3 -type f \
-            \( -name "zap-report.*" -o -name "report_json.json" \
-               -o -name "report_html.html" -o -name "*zap*.html" \
-               -o -name "*zap*.json" \) \
-            -exec cp {} dast-out/ \; 2>/dev/null || true
-          echo "=== Содержимое dast-out/ ==="
-          ls -la dast-out/ || true
+          echo "=== Отчёты ZAP в корне workspace ==="
+          ls -la report_json.json report_md.md report_html.html 2>/dev/null || true
+          find "$GITHUB_WORKSPACE" -maxdepth 2 -name "report_*.*" -print 2>/dev/null || true
 
       - name: Stop application
         if: always()
         run: docker compose down
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: dast-reports
-          path: dast-out/
-          if-no-files-found: warn
 
   report:
     name: "Unified Report"
@@ -186,7 +173,14 @@ jobs:
 
       - name: Normalize ZAP report name
         run: |
-          find pipeline/artifacts -name "zap-report.json" -exec cp {} pipeline/artifacts/ \; || true
+          # ZAP-action кладёт отчёт как report_json.json внутрь dast-reports/.
+          # merge_reports.py ищет zap-report.json — копируем под этим именем.
+          find pipeline/artifacts -name "report_json.json" \
+            -exec cp {} pipeline/artifacts/zap-report.json \; 2>/dev/null || true
+          find pipeline/artifacts -name "zap-report.json" \
+            -exec cp {} pipeline/artifacts/ \; 2>/dev/null || true
+          echo "=== Артефакты для merge ==="
+          find pipeline/artifacts -type f | sort
 
       - name: Set up Python
         uses: actions/setup-python@v5
