@@ -146,8 +146,19 @@ jobs:
         if: always()
         run: |
           mkdir -p dast-out
-          cp zap-report.json dast-out/ 2>/dev/null || true
-          cp zap-report.html dast-out/ 2>/dev/null || true
+          echo "=== Ищем файлы отчётов ZAP во всём workspace ==="
+          find "$GITHUB_WORKSPACE" -maxdepth 3 -type f \
+            \( -name "zap-report.*" -o -name "report_json.json" \
+               -o -name "report_html.html" -o -name "*zap*.html" \
+               -o -name "*zap*.json" \) -print 2>/dev/null || true
+          echo "=== Копируем всё найденное в dast-out/ ==="
+          find "$GITHUB_WORKSPACE" -maxdepth 3 -type f \
+            \( -name "zap-report.*" -o -name "report_json.json" \
+               -o -name "report_html.html" -o -name "*zap*.html" \
+               -o -name "*zap*.json" \) \
+            -exec cp {} dast-out/ \; 2>/dev/null || true
+          echo "=== Содержимое dast-out/ ==="
+          ls -la dast-out/ || true
 
       - name: Stop application
         if: always()
@@ -158,6 +169,7 @@ jobs:
         with:
           name: dast-reports
           path: dast-out/
+          if-no-files-found: warn
 
   report:
     name: "Unified Report"
