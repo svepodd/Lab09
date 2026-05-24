@@ -144,8 +144,9 @@ jobs:
           fail_action: false
           # Не создавать GitHub Issue с находками
           allow_issue_writing: false
-          # Имя артефакта, который action загрузит сам
-          artifact_name: dast-reports
+          # Имя артефакта БЕЗ дефиса: внутренний uploader ZAP-action
+          # (старый API) не принимает дефисы в имени.
+          artifact_name: dast_reports
 
       - name: Show ZAP report files
         if: always()
