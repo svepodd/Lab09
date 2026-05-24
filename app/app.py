@@ -1,19 +1,46 @@
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, jsonify
+from markupsafe import escape
 import sqlite3
 import os
 import subprocess
-import pickle
+import json
+import ast
+import ipaddress
 import logging
 
 app = Flask(__name__)
 
-app.config["DEBUG"] = True
+# FIX (py-flask-debug-enabled / CWE-489): debug выключен.
+# Управляется только через переменную окружения, по умолчанию False.
+app.config["DEBUG"] = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 
-DB_USER = "admin"
-DB_PASSWORD = "SuperSecret123"
-DB_PATH = "app.db"
+# FIX (py-hardcoded-credentials / CWE-798): секреты берём из окружения,
+# в коде значений нет. Значения по умолчанию пустые.
+DB_USER = os.environ.get("DB_USER", "")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
+DB_PATH = os.environ.get("APP_DB_PATH", "app.db")
 
-logging.basicConfig(level=logging.DEBUG)
+# Базовый уровень логирования — INFO (не DEBUG, чтобы не светить лишнее).
+logging.basicConfig(level=logging.INFO)
+
+# Каталог, из которого разрешено читать файлы (для /read).
+SAFE_READ_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "files")
+)
+os.makedirs(SAFE_READ_DIR, exist_ok=True)
+
+
+# FIX (ZAP 10038/10020/10021 и др.): добавляем security-заголовки ко всем ответам.
+@app.after_request
+def set_security_headers(resp):
+    resp.headers["Content-Security-Policy"] = "default-src 'self'"
+    resp.headers["X-Frame-Options"] = "DENY"
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["Referrer-Policy"] = "no-referrer"
+    resp.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    # FIX (ZAP 10036): не раскрываем версию сервера
+    resp.headers["Server"] = "app"
+    return resp
 
 
 def get_db():
@@ -23,7 +50,8 @@ def get_db():
 
 @app.route("/")
 def index():
-    return "Vulnerable lab07 app v1.0"
+    # FIX (py-info-version-disclosure): не раскрываем версию приложения
+    return "OK"
 
 
 @app.route("/user")
@@ -31,73 +59,132 @@ def get_user():
     username = request.args.get("name", "")
     conn = get_db()
     cur = conn.cursor()
-    query = f"SELECT id, name, email FROM users WHERE name = '{username}'"  # nosec B608
-    app.logger.debug("Executing query: %s", query)
-    rows = cur.execute(query).fetchall()
+    # FIX (py-sql-injection / CWE-89): параметризованный запрос
+    # вместо f-строки. Пользовательский ввод передаётся как параметр.
+    rows = cur.execute(
+        "SELECT id, name, email FROM users WHERE name = ?", (username,)
+    ).fetchall()
     conn.close()
-    return {"result": rows}
+    return jsonify({"result": rows})
 
 
 @app.route("/search")
 def search():
     q = request.args.get("q", "")
-    html = f"<h1>Results for: {q}</h1>"
+    # FIX (reflected XSS / CWE-79): экранируем пользовательский ввод
+    html = f"<h1>Results for: {escape(q)}</h1>"
     return make_response(html, 200)
 
 
 @app.route("/ping")
 def ping():
     host = request.args.get("host", "127.0.0.1")
-    cmd = f"ping -c 1 {host}"  # nosec B605
-    os.system(cmd)
-    return f"Pinged {host}"
+    # FIX (py-command-injection / CWE-78): валидируем host как IP-адрес и
+    # вызываем ping без shell, списком аргументов.
+    try:
+        ipaddress.ip_address(host)
+    except ValueError:
+        return "Invalid host", 400
+    subprocess.run(
+        ["ping", "-c", "1", host],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return f"Pinged {escape(host)}"
 
 
 @app.route("/backup")
 def backup():
-    target = request.args.get("target", "/tmp/backup.sql")  # nosec B108
-    cmd = ["sh", "-c", f"pg_dump mydb > {target}"]
-    subprocess.call(cmd)
+    # FIX (py-command-injection / CWE-78): больше не вызываем shell.
+    # Целевое имя жёстко фиксировано, пользовательский ввод не участвует
+    # в формировании команды.
+    target = "/tmp/backup.sql"
+    subprocess.run(
+        ["pg_dump", "mydb", "-f", target],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
     return f"Backup to {target} started"
 
 
 @app.route("/read")
 def read_file():
-    path = request.args.get("path", "/etc/passwd")
+    name = request.args.get("path", "")
+    # FIX (path traversal / CWE-22): разрешаем читать только внутри
+    # SAFE_READ_DIR. Нормализуем путь и проверяем, что он не выходит за пределы.
+    requested = os.path.abspath(os.path.join(SAFE_READ_DIR, name))
+    if not requested.startswith(SAFE_READ_DIR + os.sep):
+        return "Access denied", 403
     try:
-        with open(path, "r") as f:
+        with open(requested, "r") as f:
             data = f.read()
-        return f"<pre>{data}</pre>"
-    except Exception as e:
-        return str(e), 500
+        return make_response(f"<pre>{escape(data)}</pre>", 200)
+    except Exception:
+        return "Not found", 404
 
 
 @app.route("/load")
 def load():
     data = request.args.get("data", "")
+    # FIX (py-insecure-deserialization / CWE-502): pickle заменён на json.
+    # json не выполняет код при разборе.
     try:
-        obj = pickle.loads(bytes.fromhex(data))  # nosec B301
-        return f"Loaded object: {obj}"
-    except Exception as e:
-        return f"Error: {e}", 500
+        obj = json.loads(data)
+        return jsonify({"loaded": obj})
+    except Exception:
+        return "Invalid JSON", 400
+
+
+def _safe_calc(expr: str):
+    # Безопасный вычислитель: только числа и арифметика, без eval.
+    node = ast.parse(expr, mode="eval")
+    allowed = (
+        ast.Expression, ast.BinOp, ast.UnaryOp, ast.Constant,
+        ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub, ast.UAdd,
+    )
+    for n in ast.walk(node):
+        if not isinstance(n, allowed):
+            raise ValueError("Unsupported expression")
+        if isinstance(n, ast.Constant) and not isinstance(n.value, (int, float)):
+            raise ValueError("Only numbers allowed")
+
+    def _ev(n):
+        if isinstance(n, ast.Expression):
+            return _ev(n.body)
+        if isinstance(n, ast.Constant):
+            return n.value
+        if isinstance(n, ast.UnaryOp):
+            v = _ev(n.operand)
+            return +v if isinstance(n.op, ast.UAdd) else -v
+        a, b = _ev(n.left), _ev(n.right)
+        if isinstance(n.op, ast.Add):
+            return a + b
+        if isinstance(n.op, ast.Sub):
+            return a - b
+        if isinstance(n.op, ast.Mult):
+            return a * b
+        return a / b
+
+    return _ev(node)
 
 
 @app.route("/calc")
 def calc():
     expr = request.args.get("expr", "1+1")
-    result = eval(expr)  # nosec B307
-    return str(result)
+    # FIX (py-unsafe-eval / CWE-95): eval заменён на ограниченный
+    # AST-вычислитель _safe_calc (только арифметика над числами).
+    try:
+        return str(_safe_calc(expr))
+    except Exception:
+        return "Invalid expression", 400
 
 
-@app.route("/debug")
-def debug():
-    headers = dict(request.headers)
-    env = dict(os.environ)
-    return {
-        "headers": headers,
-        "env_sample": {k: env[k] for k in list(env)[:10]},
-    }
+# FIX: debug-эндпоинт, раскрывавший окружение, удалён —
+# он сливал переменные окружения (секреты, пути, токены).
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)  # nosec B104
+    # host берём из окружения; debug управляется конфигом (по умолчанию off)
+    app.run(host=os.environ.get("APP_HOST", "0.0.0.0"), port=8080)

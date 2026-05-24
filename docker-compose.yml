@@ -5,10 +5,13 @@ services:
     container_name: lab09-vulnerable-app
     ports:
       - "8080:8080"
+    # FIX: секреты больше не хардкодятся в compose.
+    # Они читаются из файла .env (который добавлен в .gitignore
+    # и не попадает в репозиторий). Debug по умолчанию выключен.
+    env_file:
+      - .env
     environment:
-      - FLASK_ENV=development
-      - DEBUG=true
-      - DB_PASSWORD=SuperSecret123
+      - FLASK_DEBUG=false
     restart: unless-stopped
 
 networks:
