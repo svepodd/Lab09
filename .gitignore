@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.db
+
+# Локальные отчёты сканеров (генерируются в CI как артефакты)
+pipeline/sca/reports/
+pipeline/dast/reports/
+pipeline/artifacts/
+pipeline/unified-report.html
+pipeline/sast/semgrep-report.json
+pipeline/sast/checkov-*-report.json
+pipeline/trivy-report.json
+
+# Dependency-Check кэш / данные NVD
+.dependency-check-data/
+dependency-check/
+
+# Секреты — никогда не коммитим
+.env
+*.key
+*.pem
+
+# IDE
+.idea/
+.vscode/
+.DS_Store

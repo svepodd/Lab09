@@ -1,0 +1,14 @@
+framework:
+  - dockerfile
+  - docker_compose
+
+soft-fail: true
+quiet: false
+compact: true
+download_external_modules: false
+
+file:
+  - app/Dockerfile
+  - docker-compose.yml
+
+output: cli
